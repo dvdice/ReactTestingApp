@@ -41,28 +41,28 @@ function App() {
 
     useEffect(() => {
         fetchData()
-        setTimeLeft(10)
     }, [difficulty]);
 
     useEffect(() => {
         const id = setInterval(() => {
-            if (timeLeft === 0)
-                handleAnswerButtonClick('')
-            else
-                setTimeLeft((prevState) => prevState - 1);
-
+            setTimeLeft((prev) => {
+                if (prev === 1) {
+                    handleAnswerButtonClick('')
+                    return 10
+                }
+                else
+                    return prev - 1
+            })
         }, 1000)
-        return () => {
-            clearInterval(id);
-        }
-    }, [currentQuestion, timeLeft]);
+        return () => clearInterval(id);
+    }, [currentQuestion, isFinished, isLoading]);
 
     function handleAnswerButtonClick(selectedAnswer: string) {
         if (selectedAnswer === questions[currentQuestion].correctAnswer)
-            setScore(score + 1)
+            setScore(() => score + 1)
 
         if (currentQuestion + 1 < questions.length)
-            setCurrentQuestion(currentQuestion + 1);
+            setCurrentQuestion(() => currentQuestion + 1);
         else
             setIsFinished(true);
 
