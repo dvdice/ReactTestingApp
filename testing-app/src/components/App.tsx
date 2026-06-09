@@ -10,10 +10,12 @@ function App() {
     const [score, setScore] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [questions, setQuestions] = useState<Question[]>([]);
+    const [difficulty, setDifficulty] = useState<string>('easy');
 
     async function fetchData() {
+        setIsLoading(true);
         try {
-            const res = await fetch('https://opentdb.com/api.php?amount=5&type=multiple')
+            const res = await fetch(`https://opentdb.com/api.php?amount=5&type=multiple&difficulty=${difficulty}`)
             const data: { results: ApiQuestion[] } = await res.json();
 
             const transformedQuestions: Question[] = data.results.map((item: ApiQuestion) => {
@@ -28,6 +30,7 @@ function App() {
             });
 
             setQuestions(transformedQuestions);
+            setCurrentQuestion(0)
         } catch (error) {
             console.error("Ошибка при загрузке вопросов:", error);
         } finally {
@@ -37,7 +40,7 @@ function App() {
 
     useEffect(() => {
         fetchData()
-    }, []);
+    }, [difficulty]);
 
     const handleAnswerButtonClick = (selectedAnswer: string) => {
         if (selectedAnswer === questions[currentQuestion].correctAnswer)
@@ -49,7 +52,8 @@ function App() {
             setIsFinished(true);
     }
 
-    const restartTest= () => {
+    const restartTest= async () => {
+        await fetchData();
         setCurrentQuestion(0);
         setIsFinished(false);
         setScore(0);
@@ -71,7 +75,13 @@ function App() {
         } else {
             return (
                 <div>
-                    <h1>Приложение для тестирования</h1>
+                    <h1>Приложение для тестирования. Вопрос {currentQuestion + 1} из {questions.length}</h1>
+
+                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                        <option value="easy">Легко</option>
+                        <option value="medium">Средне</option>
+                        <option value="hard">Сложно</option>
+                    </select>
 
                     <TestQuestion
                         question={questions[currentQuestion]}
