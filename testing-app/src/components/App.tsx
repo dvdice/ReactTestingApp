@@ -3,6 +3,7 @@ import '../App.css'
 import TestResult from "./TestResult.tsx";
 import TestQuestion from "./TestQuestion.tsx";
 import type {ApiQuestion, Question} from "../types.ts";
+import ResultDetails from "./ResultDetails.tsx";
 
 function App() {
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -10,6 +11,7 @@ function App() {
     const [score, setScore] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [questions, setQuestions] = useState<Question[]>([]);
+    const [answers, setAnswers] = useState<string[]>([]);
     const [difficulty, setDifficulty] = useState<string>('easy');
 
     async function fetchData() {
@@ -46,6 +48,8 @@ function App() {
         if (selectedAnswer === questions[currentQuestion].correctAnswer)
             setScore(() => score + 1)
 
+        setAnswers((prev) => [...prev, selectedAnswer])
+
         if (currentQuestion + 1 < questions.length)
             setCurrentQuestion(() => currentQuestion + 1);
         else
@@ -60,11 +64,20 @@ function App() {
 
     if (isFinished) {
         return (
-            <TestResult
-                score={score}
-                onRestartTest={restartTest}
-                totalQuestions={questions.length}
-            />
+            <div>
+                <TestResult
+                    score={score}
+                    onRestartTest={restartTest}
+                    totalQuestions={questions.length}
+                />
+
+                <ResultDetails
+                    score={score}
+                    totalQuestions={questions.length}
+                    answers={answers}
+                    questions={questions}
+                />
+            </div>
         )
     } else {
         if (isLoading) {
