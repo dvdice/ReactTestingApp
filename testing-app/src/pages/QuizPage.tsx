@@ -6,7 +6,6 @@ import {useNavigate} from "react-router-dom";
 
 const QuizPage = () => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [isFinished, setIsFinished] = useState(false);
     const [score, setScore] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -44,56 +43,55 @@ const QuizPage = () => {
         fetchData()
     }, [difficulty]);
 
-    useEffect(() => {
-        if (isFinished) {
-            const quizData = {
-                score: score,
-                totalQuestions: questions.length,
-                answers: answers,
-                questions: questions,
-            };
-
-            navigate('/results', { state: quizData });
-        }
-    }, [isFinished, score, questions, answers, navigate]);
-
     function handleAnswerButtonClick(selectedAnswer: string) {
-        if (selectedAnswer === questions[currentQuestion].correctAnswer)
-            setScore(() => score + 1)
+        const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
+
+        if (isCorrect)
+            setScore((prev) => prev + 1)
 
         setAnswers((prev) => [...prev, selectedAnswer])
 
-        if (currentQuestion + 1 < questions.length)
+        if (currentQuestion + 1 < questions.length) {
             setCurrentQuestion(() => currentQuestion + 1);
-        else
-            setIsFinished(true);
+        } else {
+            const finalScore = isCorrect ? score + 1 : score;
+            const quizData = {
+                score: finalScore,
+                totalQuestions: questions.length,
+                answers: [...answers, selectedAnswer],
+                questions: questions,
+            };
+            navigate('/results', { state: quizData });
+        }
+
     }
 
+    return (
+        <>
+            <Header/>
+            <h1>Приложение для тестирования. Вопрос {currentQuestion + 1} из {questions.length}</h1>
 
-    if (isLoading) {
-        return (
-            <h1>Вопросы загружаются...</h1>
-        )
-    } else {
-        return (
-            <>
-                <Header/>
-                <h1>Приложение для тестирования. Вопрос {currentQuestion + 1} из {questions.length}</h1>
+            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                <option value="easy">Легко</option>
+                <option value="medium">Средне</option>
+                <option value="hard">Сложно</option>
+            </select>
 
-                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-                    <option value="easy">Легко</option>
-                    <option value="medium">Средне</option>
-                    <option value="hard">Сложно</option>
-                </select>
-
-                <TestQuestion
-                    key={currentQuestion}
-                    question={questions[currentQuestion]}
-                    handleAnswerButtonClick={handleAnswerButtonClick}
-                />
-            </>
-        )
-    }
+            {isLoading ? (
+                <div className="loader-container">
+                    <h2>Вопросы загружаются...</h2>
+                </div>
+            ) : (
+                questions.length > 0 && (
+                    <TestQuestion
+                        key={currentQuestion}
+                        question={questions[currentQuestion]}
+                        handleAnswerButtonClick={handleAnswerButtonClick}
+                    />
+                )
+            )}
+        </>
+    )
 };
 
 export default QuizPage;
