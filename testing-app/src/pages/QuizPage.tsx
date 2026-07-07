@@ -3,14 +3,16 @@ import TestQuestion from "../components/TestQuestion.tsx";
 import {useEffect, useState} from "react";
 import type {ApiQuestion, Question} from "../types.ts";
 import {useNavigate} from "react-router-dom";
+import {useLocalStorage} from "../hooks/useLocalStorage.ts";
+import {decodeHTML} from "../utils/decodeHTML.ts";
 
 const QuizPage = () => {
-    const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [score, setScore] = useState(0);
-    const [isLoading, setIsLoading] = useState(true);
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const [answers, setAnswers] = useState<string[]>([]);
-    const [difficulty, setDifficulty] = useState<string>('easy');
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentQuestion, setCurrentQuestion] = useLocalStorage('currentQuestion', 0);
+    const [score, setScore] = useLocalStorage('score',0);
+    const [questions, setQuestions] = useLocalStorage<Question[]>('questions', []);
+    const [answers, setAnswers] = useLocalStorage<string[]>('answers', []);
+    const [difficulty, setDifficulty] = useLocalStorage<string>('difficulty','easy');
     const navigate = useNavigate();
 
     async function fetchData() {
@@ -24,9 +26,9 @@ const QuizPage = () => {
                 const shuffledAnswers = allAnswers.sort(() => Math.random() - 0.5);
 
                 return {
-                    questionText: item.question,
-                    correctAnswer: item.correct_answer,
-                    answerOptions: shuffledAnswers,
+                    questionText: decodeHTML(item.question),
+                    correctAnswer: decodeHTML(item.correct_answer),
+                    answerOptions: shuffledAnswers.map((answer) => decodeHTML(answer)),
                 };
             });
 
@@ -40,8 +42,9 @@ const QuizPage = () => {
     }
 
     useEffect(() => {
-        fetchData()
-    }, [difficulty]);
+        if (questions.length === 0)
+            fetchData()
+    });
 
     function handleAnswerButtonClick(selectedAnswer: string) {
         const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
@@ -66,12 +69,19 @@ const QuizPage = () => {
 
     }
 
+    async function onDifficultyChange(newDifficulty: string) {
+        setDifficulty(newDifficulty);
+        setScore(0);
+
+        await fetchData()
+    }
+
     return (
         <>
             <Header/>
             <h1>Приложение для тестирования. Вопрос {currentQuestion + 1} из {questions.length}</h1>
 
-            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+            <select value={difficulty} onChange={(e) => onDifficultyChange(e.target.value)}>
                 <option value="easy">Легко</option>
                 <option value="medium">Средне</option>
                 <option value="hard">Сложно</option>
