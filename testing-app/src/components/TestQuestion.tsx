@@ -1,5 +1,6 @@
 import type {Question} from "../types.ts";
-import {useEffect, useState} from "react";
+import {useTimer} from "../hooks/useTimer.ts";
+import {useEffect} from "react";
 
 interface TestQuestionProps {
     question: Question;
@@ -11,26 +12,18 @@ interface TestQuestionProps {
 const TestQuestion = ({
                                                             question,
                                                             handleAnswerButtonClick,
-                                                            enableTimer = false,
+                                                            enableTimer = true,
                                                             initTime = 1000
                                                         }: TestQuestionProps) => {
-    const [timeLeft, setTimeLeft] = useState(10);
+
+
+
+    const timeLeft = useTimer(enableTimer, initTime);
 
     useEffect(() => {
-        if (enableTimer) {
-            const id = setInterval(() => {
-                setTimeLeft((prev) => {
-                    if (prev === 1) {
-                        handleAnswerButtonClick('')
-                        return 10
-                    }
-                    else
-                        return prev - 1
-                })
-            }, initTime)
-            return () => clearInterval(id);
-        }
-    }, [enableTimer, handleAnswerButtonClick, initTime]);
+        if (timeLeft === 0)
+            handleAnswerButtonClick('')
+    }, [handleAnswerButtonClick, timeLeft]);
 
     return (
         <div className="test-question">

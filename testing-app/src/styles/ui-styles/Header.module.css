@@ -14,12 +14,12 @@
         }
     }
 
-    .header__nav__list {
+    .navList {
         display: flex;
         gap: 8px;
         list-style: none;
 
-        .header__nav__item {
+        .navItem {
             font-size: 25px;
             text-decoration: underline;
         }

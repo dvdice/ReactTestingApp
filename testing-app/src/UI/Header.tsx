@@ -1,24 +1,24 @@
-import classes from "../styles/ui-styles/Header.module.css"
+import styles from "../styles/ui-styles/Header.module.css"
 import classnames from "classnames"
 import { NavLink } from 'react-router-dom';
 
 const Header = () => {
     return (
-        <header className={classes.header}>
-            <div className={classes.headerContainer}>
-                <NavLink className={classnames(classes.logo, classes.links)} to="/">
+        <header className={styles.header}>
+            <div className={styles.headerContainer}>
+                <NavLink className={classnames(styles.logo, styles.links)} to="/">
                     <img src="/favicon.svg" alt="logo"/>
                     <span>Testorio</span>
                 </NavLink>
 
-                <nav className="header__nav">
-                    <ul className={classes.header__nav__list}>
-                        <li className={classes.header__nav__item}>
-                            <NavLink className={classes.links} to="/variants">Варианты</NavLink>
+                <nav>
+                    <ul className={styles.navList}>
+                        <li className={styles.navItem}>
+                            <NavLink className={styles.links} to="/variants">Варианты</NavLink>
                         </li>
 
-                        <li className={classes.header__nav__item}>
-                            <NavLink className={classes.links} to="/contacts">Контакты</NavLink>
+                        <li className={styles.navItem}>
+                            <NavLink className={styles.links} to="/contacts">Контакты</NavLink>
                         </li>
                     </ul>
                 </nav>

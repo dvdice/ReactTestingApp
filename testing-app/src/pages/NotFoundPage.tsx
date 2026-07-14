@@ -1,18 +1,15 @@
 import Header from "../UI/Header.tsx";
-import classes from "../styles/page-styles/Home.module.css";
-import CustomButton from "../UI/CustomButton.tsx";
-import { NavLink } from "react-router-dom";
+import styles from "../styles/page-styles/Home.module.css";
+import NavButton from "../components/NavButton.tsx";
 
 const NotFoundPage = () => {
     return (
         <>
             <Header/>
-            <div className={classes.root}>
+            <div className={styles.root}>
                 <h1>Ошибочка, такой страницы не существует :(</h1>
-
-                <NavLink to="/">
-                    <CustomButton text="Вернуться на главную страницу"/>
-                </NavLink>
+                
+                <NavButton to="/" buttonText="Вернуться на главную страницу"/>
             </div>
         </>
     );

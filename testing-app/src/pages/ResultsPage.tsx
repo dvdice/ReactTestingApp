@@ -1,46 +1,26 @@
 import ResultDetails from "../components/ResultDetails.tsx";
 import TestResult from "../components/TestResult.tsx";
 import Header from "../UI/Header.tsx";
-import {useLocation, useNavigate} from 'react-router-dom';
-
+import {useLocation} from 'react-router-dom';
 
 const ResultsPage = () => {
     const { state } = useLocation();
-    const navigate = useNavigate();
-
-    function handleNewTest() {
-        localStorage.removeItem('score')
-        localStorage.removeItem('currentQuestion')
-        localStorage.removeItem('answers')
-        localStorage.removeItem('questions')
-
-        navigate("/quiz")
-    }
-
-    function handleRestartTest() {
-        localStorage.removeItem('score')
-        localStorage.removeItem('currentQuestion')
-        localStorage.removeItem('answers')
-
-        navigate("/quiz")
-    }
+    const { score, totalQuestions, answers, questions } = state;
 
     return (
         <>
             <Header/>
 
             <TestResult
-                score={state.score}
-                totalQuestions={state.totalQuestions}
-                onRestartTest={handleRestartTest}
-                onNewTest={handleNewTest}
+                score={score}
+                totalQuestions={totalQuestions}
             />
 
             <ResultDetails
-                score={state.score}
-                totalQuestions={state.totalQuestions}
-                answers={state.answers}
-                questions={state.questions}
+                score={score}
+                totalQuestions={totalQuestions}
+                answers={answers}
+                questions={questions}
             />
         </>
     );

@@ -1,5 +1,5 @@
 import type {Question} from "../types.ts";
-import classes from "../styles/ResultDetails.module.css"
+import styles from "../styles/ResultDetails.module.css"
 
 interface ResultDetailsProps {
     score: number;
@@ -11,11 +11,11 @@ interface ResultDetailsProps {
 const ResultDetails = ({ answers, questions }: ResultDetailsProps) => {
     return (
         <ol>
-            {questions.map((question: Question, index: number) => (
+            {questions.map((question, index) => (
                 <li>
                     {question.questionText + ' '}
 
-                    <span className={answers[index] === question.correctAnswer ? classes.correct : classes.incorrect}>
+                    <span className={answers[index] === question.correctAnswer ? styles.correct : styles.incorrect}>
                         {question.correctAnswer}
                     </span>
                 </li>
