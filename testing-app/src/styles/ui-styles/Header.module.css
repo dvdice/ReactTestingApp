@@ -1,0 +1,41 @@
+.headerContainer {
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        span {
+            font-size: 25px;
+        }
+    }
+
+    .navList {
+        display: flex;
+        gap: 8px;
+        list-style: none;
+
+        .navItem {
+            font-size: 25px;
+            text-decoration: underline;
+        }
+    }
+}
+
+.links {
+    text-decoration: none;
+    font-family: "Roboto Slab", serif;
+    color: #2b2b2b;
+}
+
+.header {
+    background-color: #bcaab6;
+    /*position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;*/
+}

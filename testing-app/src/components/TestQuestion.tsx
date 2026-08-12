@@ -1,31 +1,33 @@
 import type {Question} from "../types.ts";
-import {useEffect, useState} from "react";
+import {useTimer} from "../hooks/useTimer.ts";
+import {useEffect} from "react";
 
 interface TestQuestionProps {
     question: Question;
     handleAnswerButtonClick: (selectedAnswer: string) => void;
+    enableTimer?: boolean;
+    initTime?: number;
 }
 
-const TestQuestion = ({question, handleAnswerButtonClick}: TestQuestionProps) => {
-    const [timeLeft, setTimeLeft] = useState(10);
+const TestQuestion = ({
+                                                            question,
+                                                            handleAnswerButtonClick,
+                                                            enableTimer = true,
+                                                            initTime = 1000
+                                                        }: TestQuestionProps) => {
+
+
+
+    const timeLeft = useTimer(enableTimer, initTime);
 
     useEffect(() => {
-        const id = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev === 1) {
-                    handleAnswerButtonClick('')
-                    return 10
-                }
-                else
-                    return prev - 1
-            })
-        }, 1000)
-        return () => clearInterval(id);
-    }, []);
+        if (timeLeft === 0)
+            handleAnswerButtonClick('')
+    }, [handleAnswerButtonClick, timeLeft]);
 
     return (
         <div className="test-question">
-            <h3>Времени осталось {timeLeft}</h3>
+            {enableTimer && (<h3>Времени осталось {timeLeft}</h3>)}
             <h2>{question.questionText}</h2>
             <div className="answers">
                 {question.answerOptions.map((answer) => (
