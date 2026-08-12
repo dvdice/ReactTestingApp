@@ -1,10 +1,11 @@
 import Header from "../UI/Header.tsx";
 import TestQuestion from "../components/TestQuestion.tsx";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import type {ApiQuestion, Question} from "../types.ts";
 import {useNavigate} from "react-router-dom";
 import {useLocalStorage} from "../hooks/useLocalStorage.ts";
 import {decodeHTML} from "../utils/decodeHTML.ts";
+import DifficultySelector from "../components/DifficultySelector.tsx";
 
 const QuizPage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -15,10 +16,11 @@ const QuizPage = () => {
     const [difficulty, setDifficulty] = useLocalStorage<string>('difficulty','easy');
     const navigate = useNavigate();
 
-    async function fetchData() {
+    const fetchData = useCallback(async (passedDifficulty?: string) => {
+        const currentDifficulty = passedDifficulty || difficulty;
         setIsLoading(true);
         try {
-            const res = await fetch(`https://opentdb.com/api.php?amount=5&type=multiple&difficulty=${difficulty}`)
+            const res = await fetch(`https://opentdb.com/api.php?amount=5&type=multiple&difficulty=${currentDifficulty}`)
             const data: { results: ApiQuestion[] } = await res.json();
 
             const transformedQuestions: Question[] = data.results.map((item: ApiQuestion) => {
@@ -39,12 +41,12 @@ const QuizPage = () => {
         } finally {
             setIsLoading(false);
         }
-    }
+    }, [difficulty, setCurrentQuestion, setQuestions])
 
     useEffect(() => {
         if (questions.length === 0)
             fetchData()
-    });
+    }, [fetchData, questions.length]);
 
     function handleAnswerButtonClick(selectedAnswer: string) {
         const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
@@ -55,7 +57,7 @@ const QuizPage = () => {
         setAnswers((prev) => [...prev, selectedAnswer])
 
         if (currentQuestion + 1 < questions.length) {
-            setCurrentQuestion(() => currentQuestion + 1);
+            setCurrentQuestion((prev) => prev + 1);
         } else {
             const finalScore = isCorrect ? score + 1 : score;
             const quizData = {
@@ -72,8 +74,9 @@ const QuizPage = () => {
     async function onDifficultyChange(newDifficulty: string) {
         setDifficulty(newDifficulty);
         setScore(0);
+        setAnswers([]);
 
-        await fetchData()
+        await fetchData(newDifficulty)
     }
 
     return (
@@ -81,11 +84,13 @@ const QuizPage = () => {
             <Header/>
             <h1>Приложение для тестирования. Вопрос {currentQuestion + 1} из {questions.length}</h1>
 
-            <select value={difficulty} onChange={(e) => onDifficultyChange(e.target.value)}>
+            <DifficultySelector onDifficultyChange={onDifficultyChange}></DifficultySelector>
+
+            {/*<select value={difficulty} onChange={(e) => onDifficultyChange(e.target.value)}>
                 <option value="easy">Легко</option>
                 <option value="medium">Средне</option>
                 <option value="hard">Сложно</option>
-            </select>
+            </select>*/}
 
             {isLoading ? (
                 <div className="loader-container">
